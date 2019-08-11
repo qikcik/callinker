@@ -1,25 +1,60 @@
+/*
+
+Npm Require: request-promise, request, MongoDB
+
+*/
+
 var rp = require('request-promise');
 
-function Request(method, parameters) {
+
+async function Request(method, parameters, key) {
     return rp({
+        method: 'POST',
         url: 'https://api.baselinker.com/connector.php',
         form: {
-            token: Key,
+            token: key,
             method: method,
             parameters: JSON.stringify(parameters)
         }
     });
 }
 
-class BaseLinker {
-    constructor(key) {
+
+module.exports = class BaseLinker {
+    constructor(MongoDB, key) {
+        this.db = MongoDB;
         this.key = key;
     }
-}
 
-exports = BaseLinker;
+    async getNewOrders() {
 
+        try {
+            let lastId = await this.db.collection('orders').find().sort({ id: -1 }).limit(1).toArray();
+            if (lastId.length = 0)
+                lastId = 0;
+            else
+                lastId = lastId[0]++;
 
-let api = new BaseLinker('2997-20704-BBM26K4I6NS8EFOM93UIH0QZYNMVVNKVE7PTFYCNLZHUDLT5A1QE5I28JYJ28L4T');
+            var data = await Request("getOrders", {
+                id_from: lastId,
+                get_unconfirmed_orders: true
+            }, this.key);
 
-console.log(api);
+            data = JSON.parse(data);
+
+            if (data.status != "SUCCESS")
+                throw new Error(`bad query status ${data}`);
+
+            console.log(data);
+            // Push Data
+
+            if (data.orders.length == 100)
+                return this.getNewOrders();
+
+        } catch (err) {
+            console.log(err);
+        }
+
+        return Promise.resolve(":)");
+    }
+};

@@ -3,11 +3,12 @@ var mongoClient = require("mongodb").MongoClient,
 
 
 
-class Database {
+module.exports = class Database {
     constructor() {
-            this.db = null;
-        }
-        /* require using promises catch and then to save working */
+        this.db = null;
+    }
+
+    /* require using promises catch and then to save working */
     async connect(url, name) {
         try {
             var connection = await mongoClient.connect(url, { useNewUrlParser: true });
@@ -21,16 +22,4 @@ class Database {
             return Promise.reject(err);
         }
     }
-
 }
-
-var base = new Database();
-exports = base;
-
-base.connect(`mongodb://localhost:270571`, `debug`).then(b => {
-    console.log(base.db);
-
-}).catch(error => {
-    console.log("an error when connecting ");
-    console.log(error);
-});
