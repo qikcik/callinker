@@ -5,6 +5,7 @@ Npm Require: request-promise, request, MongoDB
 */
 
 var rp = require('request-promise');
+var logger = require('./logger.js');
 
 
 async function Request(method, parameters, key) {
@@ -57,7 +58,7 @@ async function AddNewUnconfirmedOrders(baselinker) {
 
         var result = await baselinker.db.collection('orders').insertMany(mapped);
 
-        console.log(`insert ${mapped.length} witch last id ${mapped[mapped.length-1]._id}`);
+        logger.info(`insert ${mapped.length} witch last id ${mapped[mapped.length-1]._id}`);
 
         if (data.orders.length == 100)
             return AddNewUnconfirmedOrders(baselinker);
