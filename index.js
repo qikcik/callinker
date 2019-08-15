@@ -16,16 +16,17 @@ async function startup() {
     try {
 
         var database = new Database();
-        await database.connect(`mongodb://localhost:27057`, `debug5`);
+        await database.connect(`mongodb://localhost:27057`, `debug9`);
         logger.info('startup', 'succesful connected to database');
 
         baselinker = new Baselinker(database.db, '1652-1186-ZRFTDJMXJG48Q06F5FSOUWP4CRY59HB3M10LOQ2C8QX9FF8J0NYCA57RNTEW0355');
         await baselinker.initialize();
+        logger.info('startup', 'test');
 
         //await baselinker.getOrderByPhone('+48693982263');
 
     } catch (err) {
-        logger.critical('startup', JSON.stringify(err));
+        logger.critical('startup', err);
     }
 }
 
