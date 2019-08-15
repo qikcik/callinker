@@ -56,8 +56,8 @@ async function AddNewUnconfirmedOrders(baselinker) {
         if (data.orders.length == 0) {
             logger.debug('AddNewUnconfirmedOrders', 'nothing to initialize');
             // start first syncing
-            baselinker.sync(true);
-            return Promise.resolve(true);
+            await baselinker.sync(true);
+            return true;
         }
 
 
@@ -73,17 +73,17 @@ async function AddNewUnconfirmedOrders(baselinker) {
 
         // get next part
         if (data.orders.length == 100) {
-            return AddNewUnconfirmedOrders(baselinker);
+            return await AddNewUnconfirmedOrders(baselinker);
         }
 
     } catch (err) {
         logger.critical('AddNewUnconfirmedOrders', JSON.stringify(err));
-        return Promise.reject(err); //forward error
+        throw err; //forward error
     }
 
     // success
     baselinker.sync(true);
-    return Promise.resolve(true);
+    return true;
 }
 // return order object or null
 async function getOrder(baselinker, id) {
@@ -100,11 +100,11 @@ async function getOrder(baselinker, id) {
 
         if (data.orders[0] == null)
             return null;
-        return Promise.resolve(MapBaselinkerOrderToSimplified(data.orders[0]));
+        return MapBaselinkerOrderToSimplified(data.orders[0]);
 
     } catch (err) {
         logger.critical('getOrder', JSON.stringify(err));
-        return Promise.reject(err); //  forward error
+        throw err; //  forward error
     }
 }
 
@@ -128,7 +128,7 @@ async function updateOrdersFromJournalList(baselinker, firstSyncing = false) {
         var timestamp = Math.floor(Date.now() / 1000)
 
         if (data.logs.length == 0) {
-            return Promise.resolve(true);
+            return true;
         }
 
         for (let i = 0; i != data.logs.length; i++) {
@@ -168,10 +168,10 @@ async function updateOrdersFromJournalList(baselinker, firstSyncing = false) {
 
     } catch (err) {
         logger.critical('updateOrdersFromJournalList', JSON.stringify(err));
-        return Promise.reject(err); // forward error
+        throw err; // forward error
     } //
 
-    return updateOrdersFromJournalList(baselinker, firstSyncing);
+    return await updateOrdersFromJournalList(baselinker, firstSyncing);
 }
 
 module.exports = class BaseLinker {
@@ -186,7 +186,8 @@ module.exports = class BaseLinker {
     }
 
     async initialize() {
-        return AddNewUnconfirmedOrders(this);
+        await AddNewUnconfirmedOrders(this);
+        return true;
     }
 
     getOrderByPhone(number) {
@@ -207,6 +208,8 @@ module.exports = class BaseLinker {
             await updateOrdersFromJournalList(this, firstSyncing);
             this.anchor.emit('synced');
             this.isSyncing = false;
+            return true;
         } else logger.warning('baselinker-sync()', `trying to sync when is syncing ${JSON.stringify(new Error('trackrace'))}`);
+        return false;
     }
 };
