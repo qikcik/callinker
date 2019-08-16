@@ -5,11 +5,11 @@ Npm Require: request-promise, request, MongoDB
 */
 
 var rp = require('request-promise');
-var logger = require('./logger.js');
+var Logger = require('./logger.js');
 var usefull = require('./usefull.js');
 var events = require('events');
 
-
+var logger = new Logger.Logger("baselinker");
 
 module.exports = class BaseLinker {
 
@@ -29,6 +29,7 @@ module.exports = class BaseLinker {
     }
 
     async initialize() {
+
         if (this._isInitialized == false) {
             await this._insertPartOfUnconfirmedOrders();
             await this.sync(true);
@@ -48,6 +49,19 @@ module.exports = class BaseLinker {
             return true;
         } else logger.warning('baselinker-sync()', `trying to sync when is syncing ${new Error('trackrace')}`);
         return false;
+    }
+
+    async getOrderByPhone(number)
+    {
+        try {
+            number = usefull.validatePhoneNumber(number);
+            var result = await this._db.collection('orders').find({ phone: number }).toArray();
+            return result;
+        }
+        catch(err) {
+            logger.critical('getOrderByPhone',err);
+            throw err;
+        }
     }
 
     ////////////////////////// STEPS ///////////////////////
