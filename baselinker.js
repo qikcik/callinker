@@ -21,7 +21,7 @@ module.exports = class BaseLinker {
         this._apiToken = apiToken;
 
         this._lastLogId = 1;
-        this.anchor = new events.EventEmitter();
+        this.handler = new events.EventEmitter();
 
 
         this._isInitialized = false;
@@ -44,7 +44,7 @@ module.exports = class BaseLinker {
         if (this._isSyncing == false) {
             this._isSyncing = true;
             await this._updatePartOfOrdersFromJournalList(this, firstSyncing);
-            this.anchor.emit('synced');
+            this.handler.emit('synced');
             this._isSyncing = false;
             return true;
         } else logger.warning('baselinker-sync()', `trying to sync when is syncing ${new Error('trackrace')}`);
@@ -142,6 +142,7 @@ module.exports = class BaseLinker {
                 return true;
             }
     
+            var updated = [];
             for (let i = 0; i != data.logs.length; i++) {
                 let actual = data.logs[i];
     
@@ -152,14 +153,18 @@ module.exports = class BaseLinker {
                 }
                 // add or update order
                 if ([1, 2, 3, 7, 8, 9, 10, 11, 12, 13, 14, 16].includes(actual.log_type)) {
-                    //get actual version of order
-                    let order = await this._getOrder(actual.order_id);
+                    // for decrase ununnecessary request
+                    if(!updated.includes(actual.order_id) ) {
+                        updated.push(actual.order_id);
+                        //get actual version of order
+                        let order = await this._getOrder(actual.order_id);
     
-                    // update and update last log to don't reapeat updating it later
-                    var r = await this._db.collection('orders').updateOne({ _id: order._id }, { $set: order }, { upsert: true });
-                    this._lastLogId = actual.log_id + 1;
+                        // update and update last log to don't reapeat updating it later
+                        var r = await this._db.collection('orders').updateOne({ _id: order._id }, { $set: order }, { upsert: true });
+                        this._lastLogId = actual.log_id + 1;
     
-                    logger.debug('updateOrdersFromJournalList', `update or add witch log id ${this._lastLogId} (phone: ${order.phone})`);
+                        logger.debug('updateOrdersFromJournalList', `update or add witch log id ${this._lastLogId} (phone: ${order.phone})`);
+                    }
                 }
                 // deleted order
                 else if (actual.log_type == 4) {

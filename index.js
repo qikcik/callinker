@@ -8,8 +8,9 @@ var WebPanel = require('./webpanel.js');
 var Logger = require('./logger.js');
 require('./discordLogger.js')();
 
+var colors = require('colors');
 Logger.handler.on('log', (scope,type, tittle, value) => {
-    console.log(`[${scope}:${type}] ${tittle}: `, value);
+    console.log(`[${scope}:${type}]`.green,` ${tittle}: `, value);
 });
 
 process.on('uncaughtException', function(exception) {
