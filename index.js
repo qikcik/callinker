@@ -31,9 +31,9 @@ async function startup() {
         await database.connect(`mongodb://localhost:27057`, `debug15`);
         logger.success('startup', 'succesful connected to database');
 
-        var baselinker = new Baselinker(database.db, '1652-1186-ZRFTDJMXJG48Q06F5FSOUWP4CRY59HB3M10LOQ2C8QX9FF8J0NYCA57RNTEW0355');
+        var baselinker = new Baselinker(database.db, 'secret');
         var webPanel = new WebPanel(7777);
-        var discordManager = new DiscordManager('NjEwMjAxNDQ0NTIzNTczMjU4.XVMfSA.ugR99rMHBXhrvOfYlP1g2jyh1gk');
+        var discordManager = new DiscordManager('secret');
 
 
         discordManager.command.on( 'sync', () => baselinker.sync() );
@@ -89,7 +89,7 @@ async function startup() {
         logger.success('startup', 'webpanel Initialized');
         await discordManager.initialize();
         logger.success('startup', 'discordManager initialized');
-        await amiManager.initialize('ami','948411c88deea8b78e0f4aee134358b4','localhost',5038);
+        await amiManager.initialize('ami','secret','localhost',5038);
         logger.success('startup', 'amiManager initialized');
 
         setInterval( () => {
