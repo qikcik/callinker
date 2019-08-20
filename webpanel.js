@@ -1,13 +1,18 @@
 //SOCKET.IO
+
+var usefull = require('./usefull.js');
+
 var Express = require('express')
 var Path = require('path');
 
 var Logger = require('./logger.js');
 var logger = new Logger.Logger("webpanel");
 
+var Events = require('events');
+
 module.exports = class WebPanel {
     constructor(port) {
-
+        this.handler = new Events.EventEmitter();
         this._connectedClient = {};
 
         this._port = port;
@@ -39,22 +44,19 @@ module.exports = class WebPanel {
         return true;
     }
 
-    sendThatCalled(extension,number) {
+    sendThatCalled(extension,number,orders) {
         for (let i in this._connectedClient)
             if(this._connectedClient[i].extension == extension)
-                this._connectedClient[i].client.emit(`call answered`, {number: number});
+                this._connectedClient[i].client.emit(`answered`, {
+                    caller: number,
+                    orders: orders
+                });
     }
 
     sendThatHangup(extension,number) {
         for (let i in this._connectedClient)
             if(this._connectedClient[i].extension == extension)
-                this._connectedClient[i].client.emit(`call ended`, {number: number});
-    }
-
-    sendOrders(extension,number,orders) {
-        for (let i in this._connectedClient)
-            if(this._connectedClient[i].extension == extension)
-                this._connectedClient[i].client.emit(`receive order`, orders);
+                this._connectedClient[i].client.emit(`hangup`, {number: number});
     }
 
     //////////// PRIVATE
@@ -63,19 +65,21 @@ module.exports = class WebPanel {
     {
         this._io.on('connection', (client) => {
             // register
-            client.on('register', (extension) => {
+            client.on('login', (extension) => {
                 try {
-                    extension = extension.replace(/ /gi, '');
+                    extension = usefull.validatePhoneNumber(extension.replace(/ /gi, ''));
 
                     this._connectedClient[client.id] = {
                         client: client,
-                        extension: extension
+                        extension:  extension,
                     }
-                    client.emit('registered', extension);
-                    logger.info(`io on register`,`${client.id} connected to ${extension}`);
+                    client.emit('logged', extension);
+                    this.handler.emit('logged', extension);
+                    logger.info(`io on logged`,`${client.id} connected to ${extension}`);
                 }
                 catch(err) {
-                    logger.critical(`io on register`,err);
+                    client.emit('error', {desc: 'on login', error: err} );
+                    logger.critical(`io on logged`,err);
                 }
                 
             });
