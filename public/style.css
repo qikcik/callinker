@@ -1,0 +1,83 @@
+body {
+    margin: 0px;
+    padding: 0px;
+    background-color: #333;
+}
+
+#oncall-general {
+    font-size: 1.2rem;
+    background-color: #2589bd;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    margin-bottom: 10px;
+}
+
+
+#oncall-general .field {
+    padding: 15px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+#oncall-general .label {
+    padding-right: 5px;
+}
+
+
+#oncall-general .property {
+    font-weight: 900;
+}
+
+/* ORDERS */
+#oncall-orders {
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    align-content: stretch;
+}
+
+.oncall-order {
+    background-color: #fff;
+    text-decoration: none;
+
+    padding: 5px;
+    border: #333333 2px solid;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.oncall-order:hover {
+    background-color: #2589bd;
+    text-decoration: none;
+    color: #fff;
+}
+
+.oncall-order:visited {
+    text-decoration: none;
+    color: #000;
+}
+
+
+.oncall-order .field {
+    padding: 3px 5px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.oncall-order .label {
+    padding-right: 5px;
+}
+
+
+.oncall-order .property {
+    font-weight: 900;
+}
+

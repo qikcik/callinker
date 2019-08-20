@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title> Aterisk - baseLinker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="view-oncall" class="view">
+        <div id="oncall-general">
+            <div class="field">
+                <div class="label">stanowisko:</div> 
+                <div id="oncall-general-extension" class="property"></div>
+            </div>
+            <div class="field">
+                <div class="label">numer dzwoniądzy:</div>
+                <div id="oncall-general-caller" class="property"></div>
+            </div>
+        </div>
+        <div id="oncall-orders">
+        </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
